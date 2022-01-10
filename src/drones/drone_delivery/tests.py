@@ -1,9 +1,11 @@
 import random
+from http import HTTPStatus
 
 from django.db import IntegrityError
 from django.test import TestCase
 
 from .models import (Drone)
+from .forms import (DroneForm)
 
 class DroneTestCase(TestCase):
     def random_data_generate(self):
@@ -22,14 +24,7 @@ class DroneTestCase(TestCase):
 
             while Drone.objects.filter(serial_number = obj["serial_number"]).exists():
                 obj = self.random_data_generate()
-
-            drone = Drone(
-                serial_number = obj["serial_number"],
-                model = obj["model"],
-                weight_limit = obj["weight_limit"],
-                battery_capacity = obj["battery_capacity"],
-                state = obj["state"]
-            )
+            drone = Drone(**obj)
             drone.save()
     
     def test_create_company(self):
@@ -59,4 +54,29 @@ class DroneTestCase(TestCase):
         drone = Drone.objects.all().first()
         response = self.client.get(f"/drone-delivery/drone/{drone.slug}/detail/")
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_drone_form(self):
+        obj = self.random_data_generate()
+        drone = DroneForm(data = obj)
+
+        if drone.is_valid():
+            drone.save()
+
+            self.assertTrue(drone.is_valid())
+            self.assertTrue(Drone.objects.filter(serial_number = obj["serial_number"]).exists())
+
+    def test_drone_form_error_messages(self):
+        obj = self.random_data_generate()
+        obj["battery_capacity"] = random.randint(a = 101, b = 150)
+        obj["weight_limit"] = 601
+
+        drone = DroneForm(data = obj)
+
+        error_battery = ['<ul class="errorlist"><li>The value %s for the Battery Capacity is wrong. Battery Capacity must be value between 0 and 100</li></ul>' % obj["battery_capacity"]]
+        error_weight = ['<ul class="errorlist"><li>The value %s as Weight Limit is wrong. The value must be a maximum of 500g.</li></ul>' % obj["weight_limit"]]
+
+        self.assertFalse(drone.is_valid())
+        self.assertEqual(drone.errors["battery_capacity"], error_battery)
+        self.assertEqual(drone.errors["weight_limit"], error_weight) 
+
