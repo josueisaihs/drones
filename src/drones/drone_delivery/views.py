@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.views.generic import DetailView
 
-def index(request):
-    return render(request, "index.html", {"title": "Welcome Drone Delivery Service"})
+from . import models
+
+class DroneDetailView(DetailView):
+    model = models.Drone
