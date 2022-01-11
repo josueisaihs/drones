@@ -10,7 +10,7 @@ from . import queryset
 
 from .models import (Drone, Medication)
 from .serializers import (DroneSerializer, MedicationSerializer)
-from .filters import (DroneFilter)
+from .filters import (DroneFilter, MedicationFilter)
 
 class DroneDetailView(DetailView):
     # Only for debug
@@ -36,4 +36,4 @@ class MedicationsListCreateApiView(ListCreateAPIView):
     serializer_class = MedicationSerializer
     queryset = Medication.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ["slug", "name", "weight", "code"]
+    filterset_class = MedicationFilter
