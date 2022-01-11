@@ -13,6 +13,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--medications',
+            action="store_true",
+            help="Create the medication data"
+        )
+
+        parser.add_argument(
             '--all',
             action="store_true",
             help="Deleting all data"
@@ -22,5 +28,9 @@ class Command(BaseCommand):
         if options["drones"] or options["all"]:
             drones = Drone.objects.all()            
             drones.delete()
+
+        if options["medications"] or options["all"]:
+            # todo
+            pass
 
         self.stdout.write("SUCCESS")

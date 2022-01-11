@@ -38,6 +38,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["drones"] or options["all"]: self.creating_drone_data()
-        if options["medications"] or options["all"]: pass
+        if options["medications"] or options["all"]: 
+            # todo
+            pass
 
         self.stdout.write("SUCCESS")

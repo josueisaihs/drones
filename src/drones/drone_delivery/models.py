@@ -54,3 +54,31 @@ class Drone(models.Model):
         if not self.slug:
             self.slug = self._get_unique_slug()
         super().save(*args, **kwargs)
+
+
+class Medication(models.Model):
+    slug = models.SlugField(_("Slug"), max_length=350, blank=True, null=True)
+    name = models.CharField(_("Name"), max_length=150)
+    weight = models.DecimalField(_("Weight"), max_digits=5, decimal_places=2)
+    code = models.CharField(_("Code"), max_length=150)
+    height = models.PositiveIntegerField(
+        default=0, editable=False, null=True, blank=True
+    )
+    width = models.PositiveIntegerField(
+        default=0, editable=False, null=True, blank=True
+    )
+    image = models.ImageField(_("Image"), upload_to="medications/%Y/%m/%d/", height_field="height", width_field="width", max_length=None)
+
+    def _get_unique_slug(self):
+        slug = slugify(f'{self.name} {self.code}')
+        unique_slug = slug
+        num = 1
+        while Medication.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(slug, num)
+            num += 1
+        return unique_slug
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._get_unique_slug()
+        super().save(*args, **kwargs)
