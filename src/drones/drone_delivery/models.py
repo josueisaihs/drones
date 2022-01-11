@@ -9,8 +9,8 @@ class Drone(models.Model):
     MODELS = (
         ("Lightweight", "Lightweight"),
         ("Middleweight", "Middleweight"), 
-        ("Cruiserweight", "Middleweight"),
-        ("Heavyweight", "Middleweight")
+        ("Cruiserweight", "Cruiserweight"),
+        ("Heavyweight", "Heavyweight")
     )
 
     STATES = (

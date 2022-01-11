@@ -1,8 +1,11 @@
+from functools import partial
 import random
 from http import HTTPStatus
 
 from django.db import IntegrityError
 from django.test import TestCase
+
+from .serializers import DroneSerializer
 
 from .models import (Drone)
 from .forms import (DroneForm)
@@ -66,17 +69,42 @@ class DroneTestCase(TestCase):
             self.assertTrue(drone.is_valid())
             self.assertTrue(Drone.objects.filter(serial_number = obj["serial_number"]).exists())
 
-    def test_drone_form_error_messages(self):
+    def test_create_drone_rest_api(self):
         obj = self.random_data_generate()
-        obj["battery_capacity"] = random.randint(a = 101, b = 150)
-        obj["weight_limit"] = 601
 
-        drone = DroneForm(data = obj)
+        drone = DroneSerializer(data = obj)
+        if drone.is_valid():
+            drone.save()
 
-        error_battery = ['<ul class="errorlist"><li>The value %s for the Battery Capacity is wrong. Battery Capacity must be value between 0 and 100</li></ul>' % obj["battery_capacity"]]
-        error_weight = ['<ul class="errorlist"><li>The value %s as Weight Limit is wrong. The value must be a maximum of 500g.</li></ul>' % obj["weight_limit"]]
+        self.assertTrue(Drone.objects.filter(serial_number = obj["serial_number"]).exists())
 
-        self.assertFalse(drone.is_valid())
-        self.assertEqual(drone.errors["battery_capacity"], error_battery)
-        self.assertEqual(drone.errors["weight_limit"], error_weight) 
+    def test_update_drone_rest_api(self):
+        obj = self.random_data_generate()
+        
+        drone = DroneSerializer(data = obj)
+        if drone.is_valid():
+            drone.save()
+        
+        obj_drone = Drone.objects.filter(serial_number = obj["serial_number"]).first()
+        
+        # Modifying fields
+        state = random.choice(tuple(filter(lambda x: x[0] != obj_drone.state, Drone.STATES)))
+        update = {"battery_capacity": 90, "state": state}
+        drone_update = DroneSerializer(obj_drone, data= update, partial=True)
+
+        if drone_update.is_valid():
+            drone_update.save()
+
+        obj_update_drone = Drone.objects.filter(serial_number = obj_drone.serial_number).first()
+
+        self.assertEqual(obj_drone.serial_number, obj_update_drone.serial_number)
+
+        self.assertNotEqual(obj_drone.battery_capacity, obj_update_drone.battery_capacity)
+        self.assertEqual(obj_update_drone.battery_capacity, update["battery_capacity"])
+
+        self.assertNotEqual(obj_update_drone.state, obj_update_drone.state)
+        self.assertEqual(obj_update_drone.state, update["state"])
+
+
+
 
