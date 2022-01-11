@@ -1,5 +1,6 @@
+from django.db.models import fields
 from rest_framework import serializers
-from .models import (Drone)
+from .models import (Drone, Medication)
 
 class DroneSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
@@ -17,4 +18,10 @@ class DroneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Drone
-        fields = ["serial_number", "model", "weight_limit", "battery_capacity", "state"]
+        fields = ["slug", "serial_number", "model", "weight_limit", "battery_capacity", "state"]
+
+
+class MedicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medication
+        fields = ["slug", "name", "weight", "code", "image"]

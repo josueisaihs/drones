@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from drone_delivery.models import (Drone)
+from drone_delivery.models import (Drone, Medication)
 
 class Command(BaseCommand):
     help = "Delete all Photos"
@@ -30,7 +30,7 @@ class Command(BaseCommand):
             drones.delete()
 
         if options["medications"] or options["all"]:
-            # todo
-            pass
+            medications = Medication.objects.all()
+            medications.delete()
 
         self.stdout.write("SUCCESS")

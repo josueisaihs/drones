@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from .serializers import DroneSerializer
 
-from .models import (Drone)
+from .models import (Drone, Medication)
 from .forms import (DroneForm)
 
 class DroneTestCase(TestCase):
@@ -106,3 +106,35 @@ class DroneTestCase(TestCase):
         response = self.client.get("/drone-delivery/api/drone/list/")
         
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+
+class MedicationTestCase(TestCase):
+    def random_code_generate(self):
+        allows_characteres = [chr(i) for i in range(65, 91)] + list(map(str, range(0, 10))) + ["_", "-"]
+        L = len(allows_characteres)
+        code = []
+        code_len = random.randrange(10)
+        while len(code) <= code_len:
+            i = random.randrange(L)
+            code.append(allows_characteres[i])        
+        return "".join(code)
+
+    def setUp(self):
+        medications = ["Acetaminophen", "Adenosine", "Alprostadil", "Amiodarone", "Amitriptyline", "Ampicillin", "Anastrozole", "Apomorphine", "Ascorbic", "Atropine", "Baclofen", "Benzocaine", "Benzyl", "Betadine", "Solution", "Betamethasone", "Phosphate", "Biotin", "Bromfenac", "Brompheniramine", "Budesonide", "Bupivacaine", "Buprenorphine", "Caffeine"]
+
+        for i in medications:
+            obj = {
+                "name": i,
+                "weight": random.randrange(500),
+                "code": self.random_code_generate(),
+                "image": "medications/2022/01/11/example.jpg"
+            }
+            medication = Medication(**obj)
+            medication.save()
+    
+    def test_create_medication(self):
+        medication = Medication.objects.all()
+
+        self.assertGreater(len(medication), 0)
+        
+    

@@ -8,8 +8,8 @@ from django_filters.rest_framework import (DjangoFilterBackend)
 
 from . import queryset
 
-from .models import (Drone)
-from .serializers import (DroneSerializer)
+from .models import (Drone, Medication)
+from .serializers import (DroneSerializer, MedicationSerializer)
 from .filters import (DroneFilter)
 
 class DroneDetailView(DetailView):
@@ -26,3 +26,14 @@ class DronesListCreateApiView(ListCreateAPIView):
     queryset = Drone.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = DroneFilter
+
+class MedicationDetailApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class = MedicationSerializer
+    queryset = Medication.objects.all()
+    lookup_field = "slug"
+
+class MedicationsListCreateApiView(ListCreateAPIView):
+    serializer_class = MedicationSerializer
+    queryset = Medication.objects.all()
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["slug", "name", "weight", "code"]
