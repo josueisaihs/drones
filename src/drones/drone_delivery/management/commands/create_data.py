@@ -2,7 +2,7 @@ from random import randrange
 
 from django.core.management.base import BaseCommand
 
-from drone_delivery.models import Drone, Medication
+from drone_delivery.models import Drone, Medication, DeliveryPackage
 from drone_delivery.tests import DroneTestCase
 
 class Command(BaseCommand):
@@ -19,6 +19,12 @@ class Command(BaseCommand):
             '--medications',
             action="store_true",
             help="Create the medication data"
+        )
+
+        parser.add_argument(
+            '--delivery',
+            action="store_true",
+            help="Create the delivery package data"
         )
 
         parser.add_argument(
@@ -62,8 +68,17 @@ class Command(BaseCommand):
             medication = Medication(**obj)
             medication.save()
 
+    def creating_delivery_data(self):
+        for i in range(10):
+            deliveryPackage = DeliveryPackage()
+            deliveryPackage.drone = Drone.objects.all().order_by("?").first()
+            deliveryPackage.medications.set([medication for medication in Medication.objects.all().order_by("?")[:1 + randrange(5)]])
+            deliveryPackage.save()
+
+            
     def handle(self, *args, **options):
         if options["drones"] or options["all"]: self.creating_drone_data()
         if options["medications"] or options["all"]: self.creating_medication_data()
+        if options["delivery"] or options["all"]: self.creating_delivery_data()
 
         self.stdout.write("SUCCESS")

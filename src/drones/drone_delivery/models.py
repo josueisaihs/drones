@@ -36,7 +36,7 @@ class Drone(models.Model):
         verbose_name_plural = _("Drones")
 
     def __str__(self):
-        return self.serial_number
+        return str(self.serial_number) + f" ({self.battery_capacity}%) {self.state}"
 
     def get_absolute_url(self):
         return reverse("drone_delivery:drone-detail", kwargs={"slug": self.slug})
@@ -69,11 +69,39 @@ class Medication(models.Model):
     )
     image = models.ImageField(_("Image"), upload_to="medications/%Y/%m/%d/", height_field="height", width_field="width", max_length=None)
 
+    def __str__(self):
+        return self.name
+
     def _get_unique_slug(self):
         slug = slugify(f'{self.name} {self.code}')
         unique_slug = slug
         num = 1
         while Medication.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(slug, num)
+            num += 1
+        return unique_slug
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._get_unique_slug()
+        super().save(*args, **kwargs)
+
+class DeliveryPackage(models.Model):
+    slug = models.SlugField(_("Slug"), max_length=350, blank=True, null=True)
+    drone = models.ForeignKey(Drone, on_delete=models.CASCADE, verbose_name=_("Assigned Drone"), limit_choices_to=(models.Q(state = "IDLE") & models.Q(battery_capacity__gte = 25)))
+    # drone = models.ForeignKey(Drone, on_delete=models.CASCADE, verbose_name=_("Assigned Drone"))
+    medications = models.ManyToManyField(Medication, verbose_name=_("Medications Items"))
+
+    objects = queryset.DeliveryPackageQuerySet.as_manager()
+
+    def __str__(self):
+        return "%s" % (self.drone.serial_number)
+
+    def _get_unique_slug(self):
+        slug = slugify(f'{self.drone.serial_number}')
+        unique_slug = slug
+        num = 1
+        while DeliveryPackage.objects.filter(slug=unique_slug).exists():
             unique_slug = '{}-{}'.format(slug, num)
             num += 1
         return unique_slug

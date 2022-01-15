@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from django.db.models import Q
 
 class DroneQuerySet(QuerySet):
     def low_battery(self):
@@ -9,3 +10,7 @@ class DroneQuerySet(QuerySet):
 
     def loading_status(self):
         return self.filter(state = "LOADING")
+
+class DeliveryPackageQuerySet(QuerySet):
+    def canLoad(self):
+        return self.filter(Q(drone__state = "IDLE") & Q(drone__battery_capacity__gte = 25))

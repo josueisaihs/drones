@@ -1,16 +1,28 @@
 
 from django.views.generic import DetailView
-from django_filters.filterset import filterset_factory
 
-from rest_framework.generics import (ListCreateAPIView, RetrieveUpdateDestroyAPIView)
-from rest_framework.filters import (OrderingFilter)
-from django_filters.rest_framework import (DjangoFilterBackend)
+from rest_framework.generics import (
+    ListCreateAPIView, 
+    RetrieveUpdateDestroyAPIView
+)
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
-from . import queryset
-
-from .models import (Drone, Medication)
-from .serializers import (DroneSerializer, MedicationSerializer)
-from .filters import (DroneFilter, MedicationFilter)
+from .models import (
+    Drone, 
+    Medication, 
+    DeliveryPackage
+)
+from .serializers import (
+    DroneSerializer, 
+    MedicationSerializer,
+    DeliveryPackageSerializer
+)
+from .filters import (
+    DroneFilter, 
+    MedicationFilter
+)
+from . import serializers
 
 class DroneDetailView(DetailView):
     # Only for debug
@@ -37,3 +49,16 @@ class MedicationsListCreateApiView(ListCreateAPIView):
     queryset = Medication.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = MedicationFilter
+
+class DeliveryPackageDetailApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class = DeliveryPackageSerializer
+    queryset = DeliveryPackage.objects.all()
+    lookup_field = "slug"
+
+class DeliveryPackageListCreateApiView(ListCreateAPIView):
+    serializer_class = DeliveryPackageSerializer
+    queryset = DeliveryPackage.objects.canLoad()
+
+    def perform_create(self, serializer):
+        print(serializer)
+        instance = serializer.save()

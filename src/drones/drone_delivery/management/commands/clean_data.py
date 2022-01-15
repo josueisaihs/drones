@@ -1,6 +1,10 @@
 from django.core.management.base import BaseCommand
 
-from drone_delivery.models import (Drone, Medication)
+from drone_delivery.models import (
+    Drone, 
+    Medication, 
+    DeliveryPackage
+)
 
 class Command(BaseCommand):
     help = "Delete all Photos"
@@ -19,6 +23,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--delivery',
+            action="store_true",
+            help="Create the medication data"
+        )
+
+        parser.add_argument(
             '--all',
             action="store_true",
             help="Deleting all data"
@@ -32,5 +42,9 @@ class Command(BaseCommand):
         if options["medications"] or options["all"]:
             medications = Medication.objects.all()
             medications.delete()
+
+        if options["delivery"] or options["all"]:
+            deliveries = DeliveryPackage.objects.all()
+            deliveries.delete()
 
         self.stdout.write("SUCCESS")

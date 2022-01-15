@@ -1,0 +1,26 @@
+{% extends 'admin/base.html' %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  :root {
+    --primary: #F44336;
+    --secondary: #D32F2F;
+    --link-fg: #212121;
+    --link-selected-fg: #FFCDD2;
+    --row-height: 200px;
+  }
+
+  .photo-thumbnail {
+    max-height: var(--row-height);
+    min-height: auto;
+    max-width: auto;
+    min-width: auto;
+    align-items: center;
+  }
+
+  .photo-thumbnail > img {
+    width: auto;
+    height: var(--row-height);
+  }
+</style>
+{% endblock %}
