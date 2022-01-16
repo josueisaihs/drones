@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.conf import settings
 
+# from simple_history.models import HistoricalRecords
+
 from . import (
     queryset, 
     validators
@@ -32,6 +34,8 @@ class Drone(models.Model):
     weight_limit = models.DecimalField(_("Weight Limit"), max_digits=5, decimal_places=2, default=settings.DRONE_DELIVERY_CONFIG["MAX_WEIGHT"])
     battery_capacity = models.PositiveSmallIntegerField(_("Battery Capacity"))
     state = models.CharField(_("State"), max_length=10, choices=STATES)
+
+    # history = HistoricalRecords()
 
     objects = queryset.DroneQuerySet.as_manager()    
 

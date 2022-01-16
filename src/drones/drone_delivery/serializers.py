@@ -55,6 +55,13 @@ class PackageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Package.objects.update_or_create(**validated_data)
 
+    def to_representation(self, instance):
+        package = super().to_representation(instance)
+        medication = Medication.objects.get(id = package["medication"])
+        package['weight'] = medication.weight * package["qty"]
+
+        return package
+
 class DeliveryPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryPackage
