@@ -11,12 +11,6 @@ from .models import (
 )
 
 class DroneSerializer(serializers.ModelSerializer):
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
-
-    def create(self, validated_data):
-        return Drone.objects.update_or_create(**validated_data)
-
     def validate(self, data):
         if int(data["battery_capacity"]) < 0 or 100 < int(data["battery_capacity"]):
             raise serializers.ValidationError({"battery_capacity": _(f"The value {data['battery_capacity']} for the Battery Capacity is wrong. Battery Capacity must be value between 0 and 100")})
@@ -55,25 +49,62 @@ class MedicationSerializer(serializers.ModelSerializer):
 
 
 class PackageSerializer(serializers.ModelSerializer):
+    '''
+    INPUT 
+    {
+        "medication": <Medication.pk>,
+        "qty": <Int>
+    }
+
+    OUTPUT
+    {
+        "slug": <Slug>,
+        "medication": {<Medication(name, slug)>},
+        "qty": <Int>,
+        "created": "%y-%m-%d %H:%M",
+        "weight": <Float>
+    }
+    '''
+
     class Meta:
         model = Package
-        fields = ["slug", "medication", "qty"]
-        read_only_fields = ('slug',)
+        fields = ["slug", "medication", "qty", "created"]
+        read_only_fields = ('slug', "created")
         lookup_field = ('slug',)
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
 
-    def create(self, validated_data):
-        return Package.objects.update_or_create(**validated_data)
+    def _date_time_formater_(self, S):
+        date, time = S.split("T")
+        y, m, d = date.split("-")
+        h, M, s = time.split(":")
+
+        return f"{y}-{m}-{d} {h}:{M}"
 
     def to_representation(self, instance):
         package = super().to_representation(instance)
         medication = Medication.objects.get(id = package["medication"])
         package['weight'] = medication.weight * package["qty"]
         package["medication"] = {"name": medication.name, "slug": medication.slug}
+        package["created"] = self._date_time_formater_(package["created"])
 
         return package
+
+    def validate(self, data):
+        medication_weight = data["medication"].weight
+        qty = data["qty"]
+
+        weight = medication_weight * qty
+
+        if weight > settings.DRONE_DELIVERY_CONFIG["MAX_WEIGHT"]:
+            raise serializers.ValidationError(
+                {
+                    "qty": _(f"The weight {weight}g of the package exceeds the maximum limit ({settings.DRONE_DELIVERY_CONFIG['MAX_WEIGHT']}g) that the drones can carry")
+                }
+            )
+
+        return super().validate(data)
 
 class DeliveryPackageSerializer(serializers.ModelSerializer):
     '''
@@ -100,7 +131,7 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
                     <Medication(slug, name)>
                 )>,
             ],
-            "weight": Total Weight Package
+            "weight": <Float> # Total Weight Package
         }
     }
     '''
