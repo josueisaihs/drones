@@ -11,6 +11,9 @@ from .models import (
 )
 
 class DroneSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
     def create(self, validated_data):
         return Drone.objects.update_or_create(**validated_data)
 
@@ -27,6 +30,7 @@ class DroneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drone
         fields = ["slug", "serial_number", "model", "weight_limit", "battery_capacity", "state"]
+        read_only_fields = ('slug',)
 
 
 class MedicationSerializer(serializers.ModelSerializer):
@@ -35,15 +39,18 @@ class MedicationSerializer(serializers.ModelSerializer):
         if data["weight"] > settings.DRONE_DELIVERY_CONFIG["MAX_WEIGHT"]:
             raise serializers.ValidationError({"weight": _(f"The value must be a maximum of {settings.DRONE_DELIVERY_CONFIG['MAX_WEIGHT']}g.")})
         return data
+
     class Meta:
         model = Medication
         fields = ["slug", "name", "weight", "code", "image"]
+        read_only_fields = ('slug',)
 
 
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
         fields = ["slug", "medication", "qty"]
+        read_only_fields = ('slug',)
 
     def create(self, validated_data):
         return Package.objects.update_or_create(**validated_data)
@@ -52,6 +59,7 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryPackage
         fields = ["drone", "package", "slug"]
+        read_only_fields = ('slug',)
 
     def create(self, validated_data):
         return DeliveryPackage.objects.update_or_create(**validated_data)

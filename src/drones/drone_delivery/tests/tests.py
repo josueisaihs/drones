@@ -1,4 +1,4 @@
-import random, logging
+import random
 from http import HTTPStatus
 from django.test import TestCase
 
@@ -148,12 +148,10 @@ class MedicationTestCase(TestCase):
         medication.save()
         med = Medication.objects.filter(name = obj["name"])
 
-        logging.basicConfig(format='%(levelname)s-%(asctime)s-%(message)s', filename='test_medication_debug.log', encoding='utf-8', level=logging.DEBUG, datefmt='%m/%d/%Y %I:%M:%S %p')
-
-        logging.debug(f"Value {medication.name} is valid.")
-
         Medication.objects.filter(name = obj["name"]).exists()
 
         self.assertTrue(Medication.objects.filter(name = obj["name"]).exists())
+
+
         
     
