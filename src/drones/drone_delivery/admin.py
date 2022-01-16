@@ -11,7 +11,7 @@ from .models import (
 @admin.register(Drone)
 class DroneAdmin(admin.ModelAdmin):
     '''Admin View for Drone'''
-    list_display = ('slug', 'serial_number', 'model', 'state', 'weight_limit', 'battery_capacity')
+    list_display = ('slug', 'id', 'serial_number', 'model', 'state', 'weight_limit', 'battery_capacity')
     list_filter = ('model', 'state')
     readonly_fields = ('slug',)
     search_fields = ('slug', 'serial_number', 'model', 'weight_limit', 'battery_capacity')
@@ -42,7 +42,7 @@ class DeliveryPackageAdmin(admin.ModelAdmin):
 class PackageAdmin(admin.ModelAdmin):
     '''Admin View for Package'''
 
-    list_display = ('slug', 'medication', 'qty', 'weight', 'created')
+    list_display = ('slug', 'id', 'medication', 'qty', 'weight', 'created')
     readonly_fields = ('slug',)
     search_fields = ('slug', 'medication__name', 'qty')
     ordering = ('medication__name', 'qty')

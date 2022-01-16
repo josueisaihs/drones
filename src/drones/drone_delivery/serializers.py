@@ -31,6 +31,10 @@ class DroneSerializer(serializers.ModelSerializer):
         model = Drone
         fields = ["slug", "serial_number", "model", "weight_limit", "battery_capacity", "state"]
         read_only_fields = ('slug',)
+        lookup_field = ('slug',)
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class MedicationSerializer(serializers.ModelSerializer):
@@ -44,6 +48,10 @@ class MedicationSerializer(serializers.ModelSerializer):
         model = Medication
         fields = ["slug", "name", "weight", "code", "image"]
         read_only_fields = ('slug',)
+        lookup_field = ('slug',)
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -51,6 +59,10 @@ class PackageSerializer(serializers.ModelSerializer):
         model = Package
         fields = ["slug", "medication", "qty"]
         read_only_fields = ('slug',)
+        lookup_field = ('slug',)
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
     def create(self, validated_data):
         return Package.objects.update_or_create(**validated_data)
@@ -68,6 +80,10 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
         model = DeliveryPackage
         fields = ["slug", "drone", "package"]
         read_only_fields = ('slug',)
+        lookup_field = ('slug',)
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
         # Depth = 2 can be used to display the nested models, 
         # but I prefer to use to_representation to only display the necessary data
@@ -86,12 +102,12 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
         }
 
         packages = Package.objects.filter(id__in = delivery["package"])
-        delivery['weight'] = 0 
+        weight = 0 
 
         _packages_ = []
         for package in packages:
             package_weight = package.qty * package.medication.weight
-            delivery['weight'] = delivery['weight'] + package_weight
+            weight = weight + package_weight
             _packages_.append({
                 "slug": package.slug,
                 "weight": package_weight,
@@ -103,19 +119,54 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
             })
 
         # Change 
-        delivery["package"] = _packages_
+        delivery["package"] = {
+            "items": _packages_,
+            "weight": weight
+        }
 
         return delivery
 
     def create(self, validated_data):
-        return DeliveryPackage.objects.update_or_create(**validated_data)
+        delivery = DeliveryPackage()
+        delivery.drone = validated_data["drone"]
+        delivery.save()
+        delivery.package.set(validated_data["package"])
+        delivery.save()
+
+        return delivery
     
     def validate(self, data):
-        # todo: Validate that the weight of the package can be carried by the drone
         # Validate that the weight of the package is not greater than the maximum weight that the drone supports
-        # drone_weight_limit = data["drone"].weight_limit
-        # package_weight = sum([medication.weight for medication in data["medications"]])
-        # if drone_weight_limit < package_weight:
-        #     raise serializers.ValidationError({"drone": _("The drone does not support that weight")})
+        drone_state = data["drone"].state
+        drone_battery = data["drone"].battery_capacity
+        drone_weight_limit = data["drone"].weight_limit
+        packages_weight = sum([package.qty * package.medication.weight for package in data["package"]])
+
+        if drone_state != "IDLE":
+            raise serializers.ValidationError(
+                {
+                    "drone": _(f"The drone {data['drone'].serial_number} is busy")
+                }
+            )
+        
+        if drone_battery < settings.DRONE_DELIVERY_CONFIG["LOW_BATTERY"]:
+            raise serializers.ValidationError(
+                {
+                    "drone": _(f"The drone has low battery. The battery is under {settings.DRONE_DELIVERY_CONFIG['LOW_BATTERY']}")
+                }
+            )
+        
+        if packages_weight == 0:
+            raise serializers.ValidationError(
+                {
+                    "package": _("The package must contain at least one element.")
+                }
+            )
+        if drone_weight_limit < packages_weight:
+            raise serializers.ValidationError(
+                {
+                    "drone": _(f"The drone does not support that weight. Its max. weight is {drone_weight_limit}g and the package weight is {packages_weight}g.")
+                }
+            )
 
         return data
