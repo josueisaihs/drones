@@ -12,7 +12,29 @@ from .models import (
 )
 
 class DroneSerializer(serializers.ModelSerializer):
+    """
+    INPUT
+    {
+        "serial_number": <String>,
+        "model": <String: Cruiserweight, Lightweight, "Middleweight, Cruiserweight, Heavyweight>,
+        "weight_limit": <Float>,
+        "battery_capacity": <Int>,
+        "state": <String: IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING>
+    }
+
+    OUTPUT
+    {
+        "slug": <String>,
+        "serial_number": <String>,
+        "model": <String: Cruiserweight, Lightweight, "Middleweight, Cruiserweight, Heavyweight>,
+        "weight_limit": <Float>,
+        "battery_capacity": <Int>,
+        "state": <String: IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING>
+    }
+    """
+
     def validate(self, data):
+        # The battery capacity must be between 0 and 100% 
         if int(data["battery_capacity"]) < 0 or 100 < int(data["battery_capacity"]):
             raise serializers.ValidationError({"battery_capacity": _(f"The value {data['battery_capacity']} for the Battery Capacity is wrong. Battery Capacity must be value between 0 and 100")})
 
@@ -51,7 +73,7 @@ class MedicationSerializer(serializers.ModelSerializer):
         "image": <URL>
     }
     """
-    
+
     def _code_validation_(self, value):
         # Allowed only upper case letters [A-Z], underscore ['_'] and numbers [0-9]
         # Note: The regular expression would be ^[A-Z0-9_-]*$, but I wanted to show another way
