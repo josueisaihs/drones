@@ -1,8 +1,12 @@
-from random import randrange
+from random import choices, randrange
 
 from django.core.management.base import BaseCommand
 
-from drone_delivery.models import Drone, Medication, DeliveryPackage
+from drone_delivery.models import (
+    Drone, 
+    Medication, 
+    Package
+)
 from drone_delivery.tests import DroneTestCase
 
 class Command(BaseCommand):
@@ -22,7 +26,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            '--delivery',
+            '--package',
             action="store_true",
             help="Create the delivery package data"
         )
@@ -61,24 +65,38 @@ class Command(BaseCommand):
         for i in medications:
             obj = {
                 "name": i,
-                "weight": randrange(500),
+                "weight": randrange(1, 10),
                 "code": self.random_code_generate(),
                 "image": "medications/2022/01/11/example.jpg"
             }
             medication = Medication(**obj)
             medication.save()
 
-    def creating_delivery_data(self):
+    def creating_package_data(self):
         for i in range(10):
-            deliveryPackage = DeliveryPackage()
-            deliveryPackage.drone = Drone.objects.all().order_by("?").first()
-            deliveryPackage.medications.set([medication for medication in Medication.objects.all().order_by("?")[:1 + randrange(5)]])
-            deliveryPackage.save()
+            package = Package()
+            medication = Medication.objects.all().order_by("?").first()
+            package.medication = Medication.objects.all().order_by("?").first()
+            weight = 1000
+            qty = randrange(1, 50)
+            while weight >= 500: 
+                qty = qty - 1          
+                weight = medication.weight * qty
+            package.qty = qty 
+            package.save()
 
             
     def handle(self, *args, **options):
-        if options["drones"] or options["all"]: self.creating_drone_data()
-        if options["medications"] or options["all"]: self.creating_medication_data()
-        if options["delivery"] or options["all"]: self.creating_delivery_data()
+        if options["drones"] or options["all"]: 
+            self.creating_drone_data()
+            self.stdout.write("Drones created :)")
+
+        if options["medications"] or options["all"]: 
+            self.creating_medication_data()
+            self.stdout.write("Medications created :)")
+
+        if options["package"] or options["all"]: 
+            self.creating_package_data()
+            self.stdout.write("Packages created :)")
 
         self.stdout.write("SUCCESS")

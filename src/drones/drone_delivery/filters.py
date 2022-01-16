@@ -1,7 +1,11 @@
 from django.db.models import fields
 from django_filters.rest_framework import (FilterSet, NumberFilter)
 
-from .models import (Drone, Medication)
+from .models import (
+    Drone, 
+    Medication,
+    DeliveryPackage
+)
 
 class DroneFilter(FilterSet):
     weight_limit_gte = NumberFilter(field_name="weight_limit", lookup_expr='gte')
@@ -20,3 +24,8 @@ class MedicationFilter(FilterSet):
     class Meta:
         model = Medication
         fields = ["slug", "name", "weight", "code"]
+
+class DeliveryPackageFilter(FilterSet):
+    class Meta:
+        model = DeliveryPackage
+        fields = ["slug", "drone"]

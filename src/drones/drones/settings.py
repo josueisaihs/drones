@@ -146,3 +146,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+# DRONE CONFIG
+DRONE_DELIVERY_CONFIG = {
+    "MAX_WEIGHT": 500.0,
+}

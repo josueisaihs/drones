@@ -3,3 +3,4 @@ src/drones/db/
 src/drones/*/__pycache__/
 src/drones/*/*/__pycache__/
 src/drones/*/*/*/__pycache__
+src/drones/media/

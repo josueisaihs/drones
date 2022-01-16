@@ -6,6 +6,8 @@ from .views import (
     DroneDetailApiView, 
     MedicationDetailApiView, 
     MedicationsListCreateApiView,
+    PackageListCreateApiView,
+    PackageDetailApiView,
     DeliveryPackageDetailApiView,
     DeliveryPackageListCreateApiView
 )
@@ -18,6 +20,8 @@ urlpatterns = [
     path("api/drone/<slug:slug>/detail/", DroneDetailApiView.as_view(), name="api-drone-detail"),
     path("api/medication/list/", MedicationsListCreateApiView.as_view(), name="api-medication-list"),
     path("api/medication/<slug:slug>/detail/", MedicationDetailApiView.as_view(), name="api-medication-detail"),
+    path("api/package/list/", PackageListCreateApiView.as_view(), name="api-package-list"),
+    path("api/package/<slug:slug>/detail/", PackageDetailApiView.as_view(), name="api-package-detail"),
     path("api/delivery/<slug:slug>/detail/", DeliveryPackageDetailApiView.as_view(), name="api-delivery-detail"),
     path("api/delivery/list/", DeliveryPackageListCreateApiView.as_view(), name="api-delivery-list")
 ]

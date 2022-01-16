@@ -14,3 +14,6 @@ class DroneQuerySet(QuerySet):
 class DeliveryPackageQuerySet(QuerySet):
     def canLoad(self):
         return self.filter(Q(drone__state = "IDLE") & Q(drone__battery_capacity__gte = 25))
+
+class PackageQuerySet(QuerySet):
+    pass

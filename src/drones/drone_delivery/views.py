@@ -11,18 +11,20 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import (
     Drone, 
     Medication, 
-    DeliveryPackage
+    DeliveryPackage,
+    Package
 )
 from .serializers import (
     DroneSerializer, 
     MedicationSerializer,
-    DeliveryPackageSerializer
+    DeliveryPackageSerializer,
+    PackageSerializer
 )
 from .filters import (
     DroneFilter, 
-    MedicationFilter
+    MedicationFilter,
+    DeliveryPackageFilter
 )
-from . import serializers
 
 class DroneDetailView(DetailView):
     # Only for debug
@@ -50,6 +52,15 @@ class MedicationsListCreateApiView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = MedicationFilter
 
+class PackageDetailApiView(RetrieveUpdateDestroyAPIView):
+    serializer_class = PackageSerializer
+    queryset = DeliveryPackage.objects.all()
+    lookup_field = "slug"
+    
+class PackageListCreateApiView(ListCreateAPIView):
+    serializer_class = PackageSerializer
+    queryset = Package.objects.all()
+
 class DeliveryPackageDetailApiView(RetrieveUpdateDestroyAPIView):
     serializer_class = DeliveryPackageSerializer
     queryset = DeliveryPackage.objects.all()
@@ -58,7 +69,7 @@ class DeliveryPackageDetailApiView(RetrieveUpdateDestroyAPIView):
 class DeliveryPackageListCreateApiView(ListCreateAPIView):
     serializer_class = DeliveryPackageSerializer
     queryset = DeliveryPackage.objects.canLoad()
-
-    def perform_create(self, serializer):
-        print(serializer)
-        instance = serializer.save()
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = DeliveryPackageFilter
+    
+    # todo: Change the drone's state, IDLE to LOADING
