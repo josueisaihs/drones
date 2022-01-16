@@ -11,6 +11,7 @@ def validate_medication_code(value):
             _('the code "%(value)s" contains characters not allowed, allowed only upper case letters, underscore and numbers.'),
             params={'value': value},
         )
+    return value
 
 def validate_medication_name(value):
     # Allowed only letters, numbers, ‘-‘, ‘_’
@@ -18,3 +19,4 @@ def validate_medication_name(value):
         raise ValueError(
             _(f"The name {value} contains characters not allowed, allowed only letters, numbers, '-', '_'")
         )
+    return value

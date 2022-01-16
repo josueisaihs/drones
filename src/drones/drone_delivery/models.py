@@ -66,9 +66,11 @@ class Drone(models.Model):
 
 class Medication(models.Model):
     slug = models.SlugField(_("Slug"), max_length=350, blank=True, null=True)
-    name = models.CharField(_("Name"), max_length=150, unique=True, validators=[validators.validate_medication_name])
+    # name = models.CharField(_("Name"), max_length=150, unique=True, validators=[validators.validate_medication_name])
+    name = models.CharField(_("Name"), max_length=150, unique=True)
     weight = models.DecimalField(_("Weight"), max_digits=5, decimal_places=2)
-    code = models.CharField(_("Code"), max_length=150, validators=[validators.validate_medication_code])
+    # code = models.CharField(_("Code"), max_length=150, validators=[validators.validate_medication_code])
+    code = models.CharField(_("Code"), max_length=150)
     height = models.PositiveIntegerField(
         default=0, editable=False, null=True, blank=True
     )

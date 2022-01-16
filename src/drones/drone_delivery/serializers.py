@@ -1,6 +1,7 @@
+import re
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-
 from django.conf import settings
 
 from .models import (
@@ -32,10 +33,57 @@ class DroneSerializer(serializers.ModelSerializer):
 
 
 class MedicationSerializer(serializers.ModelSerializer):
+    """
+    INPUT
+    {
+        "name": <String>,
+        "weight": <Float>,
+        "code": <String>,
+        "image": <Image>
+    }
+
+    OUTPUT
+    {
+        "slug": <Slug>,
+        "name": <String>,
+        "weight": <Float>,
+        "code": <String>,
+        "image": <URL>
+    }
+    """
+    
+    def _code_validation_(self, value):
+        # Allowed only upper case letters [A-Z], underscore ['_'] and numbers [0-9]
+        # Note: The regular expression would be ^[A-Z0-9_-]*$, but I wanted to show another way
+        allows_characters = [chr(i) for i in range(65, 91)] + list(map(str, range(0, 10))) + ["_",]
+        return all([_chr_ in allows_characters for _chr_ in value])
+
+    def _name_validation_(self, value):        
+        # Allowed only letters [A-Za-z], numbers[0-9], ‘-‘, ‘_’
+        return re.match(r'^[A-Za-z0-9_-]*$', value)
+
     def validate(self, data):
+        if not self._name_validation_(data["name"]):
+            raise serializers.ValidationError(
+                {
+                    "name": _(f"The name {data['name']} contains characters not allowed, allowed only letters, numbers, '-', '_'")
+                }
+            )
+
+        if not self._code_validation_(data["code"]):
+            raise serializers.ValidationError(
+                {
+                    "code": _(f"The code '{data['code']}' contains characters not allowed, allowed only upper case letters, underscore and numbers."),
+                }
+            )
+
         # Validate that the weight of the medication can be carried by the drone
         if data["weight"] > settings.DRONE_DELIVERY_CONFIG["MAX_WEIGHT"]:
-            raise serializers.ValidationError({"weight": _(f"The value must be a maximum of {settings.DRONE_DELIVERY_CONFIG['MAX_WEIGHT']}g.")})
+            raise serializers.ValidationError(
+                {
+                    "weight": _(f"The value must be a maximum of {settings.DRONE_DELIVERY_CONFIG['MAX_WEIGHT']}g.")
+                }
+            )
         return data
 
     class Meta:
