@@ -50,7 +50,7 @@ class Command(BaseCommand):
 
     def random_code_generate(self):
         """ Generate Code for Medication"""
-        allows_characteres = [chr(i) for i in range(65, 91)] + list(map(str, range(0, 10))) + ["_", "-"]
+        allows_characteres = [chr(i) for i in range(65, 91)] + list(map(str, range(0, 10))) + ["_",]
         L = len(allows_characteres)
         code = []
         code_len = randrange(10)

@@ -1,0 +1,10 @@
+Watching for file changes with StatReloader
+"GET /drone-delivery/api/drone/list/ HTTP/1.1" 200 13526
+"GET /static/rest_framework/fonts/glyphicons-halflings-regular.woff2 HTTP/1.1" 200 18028
+"GET /drone-delivery/api/drone/list/ HTTP/1.1" 200 13526
+"OPTIONS /drone-delivery/api/drone/list/ HTTP/1.1" 200 5748
+"OPTIONS /drone-delivery/api/drone/list/ HTTP/1.1" 200 5748
+"OPTIONS /drone-delivery/api/drone/list/ HTTP/1.1" 200 5748
+"GET /drone-delivery/api/drone/list/ HTTP/1.1" 200 13526
+"GET /drone-delivery/api/drone/20999/detail/ HTTP/1.1" 200 5664
+/Users/josueisaihs/Documents/TecnicalTest/Drones/src/drones/drones/settings.py changed, reloading.

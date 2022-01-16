@@ -1,11 +1,11 @@
-import random
+import random, logging
 from http import HTTPStatus
 from django.test import TestCase
 
-from .serializers import DroneSerializer
+from ..serializers import DroneSerializer
 
-from .models import (Drone, Medication)
-from .forms import (DroneForm)
+from ..models import (Drone, Medication)
+from ..forms import (DroneForm)
 
 class DroneTestCase(TestCase):
     def random_data_generate(self):
@@ -136,5 +136,24 @@ class MedicationTestCase(TestCase):
         medication = Medication.objects.all()
 
         self.assertGreater(len(medication), 0)
+
+    def test_create_invalid_name_medication(self):
+        obj = {
+            "name": "ABSabs@#$",
+            "weight": 10.0,
+            "code": "AGSHFD-",
+            "image": "medications/2022/01/11/example.jpg"
+        }
+        medication = Medication.objects.create(**obj)
+        medication.save()
+        med = Medication.objects.filter(name = obj["name"])
+
+        logging.basicConfig(format='%(levelname)s-%(asctime)s-%(message)s', filename='test_medication_debug.log', encoding='utf-8', level=logging.DEBUG, datefmt='%m/%d/%Y %I:%M:%S %p')
+
+        logging.debug(f"Value {medication.name} is valid.")
+
+        Medication.objects.filter(name = obj["name"]).exists()
+
+        self.assertTrue(Medication.objects.filter(name = obj["name"]).exists())
         
     
