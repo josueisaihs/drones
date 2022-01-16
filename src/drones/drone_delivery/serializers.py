@@ -76,6 +76,34 @@ class PackageSerializer(serializers.ModelSerializer):
         return package
 
 class DeliveryPackageSerializer(serializers.ModelSerializer):
+    '''
+    INPUT
+    {
+        "slug": <Drone.pk>
+        "pacakge": [<Package.pk>, <Package.pk>, ..., <Package.pk>]
+    }
+
+    OUTPUT
+    {
+        "slug": <Slug>,
+        "drone": <Drone(slug, serial_number, weight_limit, battery_capacity)>,
+        "package": {
+            "items": [
+                <Package(slug, weight, qty, 
+                    <Medication(slug, name)>
+                )>,
+                <Package(slug, weight, qty, 
+                    <Medication(slug, name)>
+                )>,
+                ...
+                <Package(slug, weight, qty, 
+                    <Medication(slug, name)>
+                )>,
+            ],
+            "weight": Total Weight Package
+        }
+    }
+    '''
     class Meta:
         model = DeliveryPackage
         fields = ["slug", "drone", "package"]
