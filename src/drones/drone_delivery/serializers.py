@@ -59,14 +59,53 @@ class PackageSerializer(serializers.ModelSerializer):
         package = super().to_representation(instance)
         medication = Medication.objects.get(id = package["medication"])
         package['weight'] = medication.weight * package["qty"]
+        package["medication"] = {"name": medication.name, "slug": medication.slug}
 
         return package
 
 class DeliveryPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryPackage
-        fields = ["drone", "package", "slug"]
+        fields = ["slug", "drone", "package"]
         read_only_fields = ('slug',)
+
+        # Depth = 2 can be used to display the nested models, 
+        # but I prefer to use to_representation to only display the necessary data
+        # depth = 2
+
+    def to_representation(self, instance):
+        delivery = super().to_representation(instance)
+
+        # Change drone representation
+        drone = Drone.objects.get(id = delivery["drone"])
+        delivery["drone"] = {
+            "slug": drone.slug, 
+            "serial_number": drone.serial_number,
+            "weight_limit": drone.weight_limit,
+            "battery_capacity": drone.battery_capacity
+        }
+
+        packages = Package.objects.filter(id__in = delivery["package"])
+        delivery['weight'] = 0 
+
+        _packages_ = []
+        for package in packages:
+            package_weight = package.qty * package.medication.weight
+            delivery['weight'] = delivery['weight'] + package_weight
+            _packages_.append({
+                "slug": package.slug,
+                "weight": package_weight,
+                "qty": package.qty,
+                "medication": {
+                    "slug": package.medication.slug,
+                    "name": package.medication.name
+                }
+            })
+
+        # Change 
+        delivery["package"] = _packages_
+
+        return delivery
 
     def create(self, validated_data):
         return DeliveryPackage.objects.update_or_create(**validated_data)
