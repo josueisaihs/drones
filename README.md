@@ -1,5 +1,5 @@
 ## Create and Update Drone
-
+%
 {
     "slug": "20999",
     "serial_number": "20999",
@@ -9,6 +9,7 @@
     "state": "LOADING"
 }
 
+% 
 {
         "slug": "19495-1",
         "drone": {
@@ -32,3 +33,6 @@
             "weight": 45.0
         }
     }
+
+## Redis
+https://download.redis.io/releases/redis-6.2.6.tar.gz

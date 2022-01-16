@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.conf import settings
 
-# from simple_history.models import HistoricalRecords
+from simple_history.models import HistoricalRecords
 
 from . import (
     queryset, 
@@ -35,7 +35,7 @@ class Drone(models.Model):
     battery_capacity = models.PositiveSmallIntegerField(_("Battery Capacity"))
     state = models.CharField(_("State"), max_length=10, choices=STATES)
 
-    # history = HistoricalRecords()
+    history = HistoricalRecords()
 
     objects = queryset.DroneQuerySet.as_manager()    
 

@@ -45,8 +45,8 @@ INSTALLED_APPS = [
 
     # THIRD PARTY
     'rest_framework',
-    'django_filters'
-    # 'simple_history',
+    'django_filters',
+    'simple_history',
     # 'background_task'
 ]
 
@@ -60,7 +60,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # THIRD  PARTY
-    # 'simple_history.middleware.HistoryRequestMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'drones.urls'
@@ -151,6 +151,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+# CELERY STUFF
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # DRONE CONFIG
 DRONE_DELIVERY_CONFIG = {
