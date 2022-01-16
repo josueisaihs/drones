@@ -247,7 +247,7 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
                 }
             })
 
-        # Change 
+        # Change package representation
         delivery["package"] = {
             "items": _packages_,
             "weight": weight
@@ -261,6 +261,11 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
         delivery.save()
         delivery.package.set(validated_data["package"])
         delivery.save()
+
+        # Change drone state from IDLE to LOADING
+        drone = Drone.objects.get(slug = delivery.drone.slug)
+        drone.state = "LOADING"
+        drone.save()
 
         return delivery
     
