@@ -15,7 +15,7 @@ class Command(BaseCommand):
         )
     
     def handle(self, *args, **options):
-        for drone in Drone.objects.low_battery().are_working():
+        for drone in Drone.objects.all():
             drone.battery_capacity = randrange(10, 100) if options["random"] else 100
             drone.save()
             self.stdout.write(f"Drone: {drone.serial_number}, Battery {drone.battery_capacity}%") 

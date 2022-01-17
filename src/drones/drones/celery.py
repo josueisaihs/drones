@@ -23,7 +23,7 @@ app.config_from_object(settings, namespace="CELERY")
 # Celery Beat Settings
 app.conf.beat_schedule = {
     # Executes.
-    'task_drone_battery_capacity_check_each_1_min': {
+    'task_drone_battery_capacity_check_each_x_min': {
         'task': 'drone_delivery.tasks.task_drone_battery_capacity_check',
         'schedule': crontab(minute=f"*/{settings.DRONE_DELIVERY_CONFIG['BATTERY_STATUS_UPDATE_TIME']}"),
     },

@@ -12,9 +12,6 @@ class DroneQuerySet(QuerySet):
     def loading_status(self):
         return self.filter(state = "LOADING")
 
-    def are_working(self):
-        return self.exclude(state = "IDLE")
-
 class DeliveryPackageQuerySet(QuerySet):
     def canLoad(self):
         return self.filter(Q(drone__state = "IDLE") & Q(drone__battery_capacity__gte = settings.DRONE_DELIVERY_CONFIG["LOW_BATTERY"]))
