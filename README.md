@@ -166,10 +166,13 @@ A drone can load up to ``MAX_WEIGHT``, configured in the ``settings.py``.
 The states ``IDLE``, ``LOADING``, ``LOADED``, ``DELIVERING``, ``DELIVERED``, ``RETURNING``. A drone can only receive a charge if it is in ``IDLE`` state
 
 To create, retrieve, update and destroy drones:
+
 ``Create and List``
 [http://localhost:8000/drone-delivery/api/drone/list/](http://localhost:8000/drone-delivery/api/drone/list/)
+
 ``Retrieve, Update, Destroy``
 [http://localhost:8000/drone-delivery/api/drone/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/drone/list/)
+
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
 {
@@ -180,6 +183,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
     "state": <String: IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING>
 }
 ```
+
 JSON format to ``list`` results:
 ```json
 {
@@ -198,10 +202,13 @@ The code field allow only upper case letters [A-Z], underscore and numbers [0-9]
 A medication can have a maximum weight of ``MAX_WEIGHT``, configured in the ``settings.py``.
 
 To create, retrieve, update and destroy medications:
+
 ``Create and List``
 [http://localhost:8000/drone-delivery/api/medication/list/](http://localhost:8000/drone-delivery/api/medication/list/)
+
 ``Retrieve, Update, Destroy``
 [http://localhost:8000/drone-delivery/api/medication/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/medication/list/)
+
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
 {
@@ -211,6 +218,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
     "image": <Image>
 }
 ```
+
 JSON format to ``list`` results:
 ```json
 {
@@ -227,10 +235,13 @@ A package is a certain medication with the respective quantity.
 A package can have a maximum weight of ``MAX_WEIGHT``, configured in the ``settings.py``.
 
 To create, retrieve, update and destroy medications:
+
 ``Create and List``
 [http://localhost:8000/drone-delivery/api/package/list/](http://localhost:8000/drone-delivery/api/package/list/)
+
 ``Retrieve, Update, Destroy``
 [http://localhost:8000/drone-delivery/api/package/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/package/list/)
+
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
 {
@@ -238,6 +249,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
     "qty": <Int>
 }
 ```
+
 JSON format to ``list`` results:
 ```json
 {
@@ -257,6 +269,7 @@ A delivery package is to assign a drone a certain number of packages, as long as
 A drone is only available for loading when its battery is greater than ``LOW_BATTERY``, configured in the settings, and it is in ``IDLE`` state.
 
 To create, retrieve, update and destroy deliveries packages:
+
 ``Create and List``
 
 [http://localhost:8000/drone-delivery/api/delivery/list/](http://localhost:8000/drone-delivery/api/delivery/list/)
