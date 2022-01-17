@@ -136,7 +136,7 @@ $ cd src
 $ ./redis-cli
 $ redis> ping
 PONG
-redis>quit
+$ redis>quit
 ```
 #### Celery
 Open a new instance of the terminal in the project's containing folder to initialize celery:
@@ -171,7 +171,7 @@ To create, retrieve, update and destroy drones:
 [http://localhost:8000/drone-delivery/api/drone/list/](http://localhost:8000/drone-delivery/api/drone/list/)
 
 ``Retrieve, Update, Destroy``
-[http://localhost:8000/drone-delivery/api/drone/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/drone/list/)
+[http://localhost:8000/drone-delivery/api/drone/slug/detail/](http://localhost:8000/drone-delivery/api/drone/list/)
 
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
@@ -207,7 +207,7 @@ To create, retrieve, update and destroy medications:
 [http://localhost:8000/drone-delivery/api/medication/list/](http://localhost:8000/drone-delivery/api/medication/list/)
 
 ``Retrieve, Update, Destroy``
-[http://localhost:8000/drone-delivery/api/medication/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/medication/list/)
+[http://localhost:8000/drone-delivery/api/medication/slug/detail/](http://localhost:8000/drone-delivery/api/medication/list/)
 
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
@@ -240,7 +240,7 @@ To create, retrieve, update and destroy medications:
 [http://localhost:8000/drone-delivery/api/package/list/](http://localhost:8000/drone-delivery/api/package/list/)
 
 ``Retrieve, Update, Destroy``
-[http://localhost:8000/drone-delivery/api/package/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/package/list/)
+[http://localhost:8000/drone-delivery/api/package/slug/detail/](http://localhost:8000/drone-delivery/api/package/list/)
 
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
@@ -271,12 +271,10 @@ A drone is only available for loading when its battery is greater than ``LOW_BAT
 To create, retrieve, update and destroy deliveries packages:
 
 ``Create and List``
-
 [http://localhost:8000/drone-delivery/api/delivery/list/](http://localhost:8000/drone-delivery/api/delivery/list/)
 
 ``Retrieve, Update, Destroy``
-
-[http://localhost:8000/drone-delivery/api/delivery/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/delivery/list/)
+[http://localhost:8000/drone-delivery/api/delivery/slug/detail/](http://localhost:8000/drone-delivery/api/delivery/list/)
 
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
