@@ -258,10 +258,13 @@ A drone is only available for loading when its battery is greater than ``LOW_BAT
 
 To create, retrieve, update and destroy deliveries packages:
 ``Create and List``
+
 [http://localhost:8000/drone-delivery/api/delivery/list/](http://localhost:8000/drone-delivery/api/delivery/list/)
 
 ``Retrieve, Update, Destroy``
+
 [http://localhost:8000/drone-delivery/api/delivery/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/delivery/list/)
+
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
 {
@@ -269,6 +272,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
     "package": [<Package.pk>, <Package.pk>, ..., <Package.pk>]
 }
 ```
+
 JSON format to ``list`` results:
 ```json
 {
@@ -316,5 +320,6 @@ $ curl -u 'admin:password' -d '{"medication": 2, "qty": 1}' -H "Content-Type: ap
 ```
 Finally, the drone is assigned (id = 14) and the packages created (id = 14, id = 15) to form the delivery package:
 ```sh
-$ curl -u 'admin:password' -d '{"drone": 14, "package": [14, 15]}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/delivery/list/{"slug":"456345647","drone":{"slug":"456345647","serial_number":456345647.0,"weight_limit":400.0,"battery_capacity":74},"package":{"items":[{"slug":"acetaminophen-1","weight":3.0,"qty":1,"medication":{"slug":"acetaminophen-x5pjf530s0","name":"Acetaminophen"}},{"slug":"adenosine-1","weight":7.0,"qty":1,"medication":{"slug":"adenosine-uxv","name":"Adenosine"}}],"weight":10.0}}
+$ curl -u 'admin:password' -d '{"drone": 14, "package": [14, 15]}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/delivery/list/
+{"slug":"456345647","drone":{"slug":"456345647","serial_number":456345647.0,"weight_limit":400.0,"battery_capacity":74},"package":{"items":[{"slug":"acetaminophen-1","weight":3.0,"qty":1,"medication":{"slug":"acetaminophen-x5pjf530s0","name":"Acetaminophen"}},{"slug":"adenosine-1","weight":7.0,"qty":1,"medication":{"slug":"adenosine-uxv","name":"Adenosine"}}],"weight":10.0}}
 ```
