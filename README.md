@@ -4,12 +4,14 @@ There is a major new technology that is destined to be a disruptive force in the
 
 Useful drone functions include delivery of small items that are (urgently) needed in locations with difficult access.
 
+We have a fleet of **10 drones**. A drone is capable of carrying devices, other than cameras, and capable of delivering small loads. For our use case **the load is medications**.
+
 ## Features
-- Create Drone
-- Create Medications
-- Create Medication Packages
-- Create Package Shipments
-- Update battery status every 1 minute
+- Registering a Drone
+- Loading drone with medications items
+- Checking loaded medication items for a given drone
+- Checking available drones for loading
+- Check drone battery level for a given drone
 
 ## Tech
 
@@ -65,7 +67,7 @@ Create data tot test the app:
 ./manage.py create_data --all
 ```
 (optional) Added custom commands to add and remove data for testing the app.
-The options of the create command are:
+The create command options are:
 ```sh
 ./manage.py create_data [--all] [--drone] [--medications] [--package]
 optional arguments:
@@ -74,7 +76,7 @@ optional arguments:
 --package       Create packets with random data
 --all           Create all the above data
 ```
-The options of the remove command are:
+The remove command options are:
 ```sh
 ./manage.py clean_data [--all] [--drone] [--medications] [--package] [--delivery]
 optional arguments:
@@ -84,6 +86,13 @@ optional arguments:
 --delivery      Remove delivery packages
 --all           Remove all data
 ```
+The battery charge command options are:
+```sh
+./manage.py charge_batteries [--random]
+optional arguments:
+--random         Provides a random value between 10 and 100 for the battery status
+```
+Charge the drones that are in Low Battery and their state is other than IDLE, to a state of charge of 100%.
 ### Settings
 Must set the following fields in the ``settings.py``:
 ```python
@@ -93,7 +102,6 @@ DRONE_DELIVERY_CONFIG = {
     "BATTERY_STATUS_UPDATE_TIME": 1,
 }
 ```
-
 | Key | Description |
 | ------ | ------ |
 |MAX_WEIGHT | Maximum capacity that supports a drone |
@@ -141,4 +149,144 @@ And open an another instance of the terminal in the project's containing folder 
 source env/bin/activate
 cd src/drones
 celery -A drones beat -l info
+```
+
+### Test
+---
+To run the tests, try the following:
+```sh
+./migrate test
+```
+### API
+---
+#### Drones
+The serial number can only have up to 100 characters.
+A drone can load up to ``MAX_WEIGHT``, configured in the ``settings.py``.
+The states ``IDLE``, ``LOADING``, ``LOADED``, ``DELIVERING``, ``DELIVERED``, ``RETURNING``. A drone can only receive a charge if it is in ``IDLE`` state
+
+To create, retrieve, update and destroy drones:
+``Create and List``
+[http://localhost:8000/drone-delivery/api/drone/list/](http://localhost:8000/drone-delivery/api/drone/list/)
+``Retrieve, Update, Destroy``
+[http://localhost:8000/drone-delivery/api/drone/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/drone/list/)
+JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
+```json
+{
+    "serial_number": <String>,
+    "model": <String: Cruiserweight, Lightweight, "Middleweight, Cruiserweight, Heavyweight>,
+    "weight_limit": <Float>,
+    "battery_capacity": <Int>,
+    "state": <String: IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING>
+}
+```
+JSON format to ``list`` results:
+```json
+{
+    "slug": <String>,
+    "serial_number": <String>,
+    "model": <String: Cruiserweight, Lightweight, "Middleweight, Cruiserweight, Heavyweight>,
+    "weight_limit": <Float>,
+    "battery_capacity": <Int>,
+    "state": <String: IDLE, LOADING, LOADED, DELIVERING, DELIVERED, RETURNING>
+}
+```
+#### Medications
+The name field Allow only letters [A-Za-z], numbers [0-9], "-" and underscore 
+The code field allow only upper case letters [A-Z], underscore and numbers [0-9]
+A medication can have a maximum weight of ``MAX_WEIGHT``, configured in the ``settings.py``.
+
+To create, retrieve, update and destroy medications:
+``Create and List``
+[http://localhost:8000/drone-delivery/api/medication/list/](http://localhost:8000/drone-delivery/api/medication/list/)
+``Retrieve, Update, Destroy``
+[http://localhost:8000/drone-delivery/api/medication/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/medication/list/)
+JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
+```json
+{
+    "name": <String>,
+    "weight": <Float>,
+    "code": <String>,
+    "image": <Image>
+}
+```
+JSON format to ``list`` results:
+```json
+{
+    "slug": <Slug>,
+    "name": <String>,
+    "weight": <Float>,
+    "code": <String>,
+    "image": <URL>
+}
+```
+#### Packages
+A package is a certain medication with the respective quantity.
+A package can have a maximum weight of ``MAX_WEIGHT``, configured in the ``settings.py``.
+
+To create, retrieve, update and destroy medications:
+``Create and List``
+[http://localhost:8000/drone-delivery/api/package/list/](http://localhost:8000/drone-delivery/api/package/list/)
+``Retrieve, Update, Destroy``
+[http://localhost:8000/drone-delivery/api/package/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/package/list/)
+JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
+```json
+{
+    "medication": <Medication.pk>,
+    "qty": <Int>
+}
+```
+JSON format to ``list`` results:
+```json
+{
+    "slug": <Slug>,
+    "medication": {
+        "name": <String>,
+        "slug": <Slug>
+    },
+    "qty": <Int>,
+    "created": "%y-%m-%d %H:%M",
+    "weight": <Float>
+}
+```
+#### Deliveries Packages
+A delivery package is to assign a drone a certain number of packages, as long as the drone is capable of supporting the weight of the load.
+A drone is only available for loading when its battery is greater than ``LOW_BATTERY``, configured in the settings, and it is in ``IDLE`` state.
+
+To create, retrieve, update and destroy deliveries packages:
+``Create and List``
+[http://localhost:8000/drone-delivery/api/delivery/list/](http://localhost:8000/drone-delivery/api/delivery/list/)
+``Retrieve, Update, Destroy``
+[http://localhost:8000/drone-delivery/api/delivery/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/delivery/list/)
+JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
+```json
+{
+    "slug": <Drone.pk>,
+    "package": [<Package.pk>, <Package.pk>, ..., <Package.pk>]
+}
+```
+JSON format to ``list`` results:
+```json
+{
+    "slug": <Slug>,
+    "drone": {
+        "slug": <Slug>, 
+        "serial_number": <String>, 
+        "weight_limit": <Float>, 
+        "battery_capacity": <Int>
+    },
+    "package": {
+        "items": [
+            {
+                "slug": <Slug>, 
+                "weight": <Float>, 
+                "qty": <Int>,
+                "medication": {
+                    "slug": <Slug>,
+                    "name": <String>
+                }
+            }
+        ],
+        "weight": <Float>
+    }
+}
 ```
