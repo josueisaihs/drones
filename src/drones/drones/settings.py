@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     # THIRD PARTY
     'rest_framework',
     'django_filters',
-    'simple_history',
-    # 'background_task'
+    'simple_history'
 ]
 
 MIDDLEWARE = [
@@ -121,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Havana'
 
 USE_I18N = True
 
@@ -144,6 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Other Configurations
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -153,14 +153,45 @@ REST_FRAMEWORK = {
 }
 
 # CELERY STUFF
-BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = 'redis://localhost:6379'
+RESULT_BACKEND = 'redis://localhost:6379'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s module=%(module)s, '
+            'process_id=%(process)d, %(message)s'
+        }
+    },
+    'loggers': {
+        'drones_delivery': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'celery': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+    }
+}
+
 
 # DRONE CONFIG
 DRONE_DELIVERY_CONFIG = {
     "MAX_WEIGHT": 500.0,
-    "LOW_BATTERY": 25.0
+    "LOW_BATTERY": 25.0,
+    "BATTERY_STATUS_UPDATE_TIME": 1, # Minutes
 }
