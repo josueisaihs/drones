@@ -1,5 +1,6 @@
-from random import choices, randrange
+from random import randrange
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from drone_delivery.models import (
@@ -29,6 +30,12 @@ class Command(BaseCommand):
             '--package',
             action="store_true",
             help="Create the delivery package data"
+        )
+
+        parser.add_argument(
+            '--user',
+            action="store_true",
+            help="Create an user"
         )
 
         parser.add_argument(
@@ -85,6 +92,15 @@ class Command(BaseCommand):
             package.qty = qty 
             package.save()
 
+    def create_user(self):
+        User = get_user_model()
+        User.objects.filter(username = "admin").delete()
+        
+        user = User(username = "admin", email = "admin@example.com")
+        user.is_staff = True
+        user.is_superuser = True
+        user.set_password("password")
+        user.save()
             
     def handle(self, *args, **options):
         if options["drones"] or options["all"]: 
@@ -98,5 +114,9 @@ class Command(BaseCommand):
         if options["package"] or options["all"]: 
             self.creating_package_data()
             self.stdout.write("Packages created :)")
+
+        if options["user"] or options["all"]:
+            self.create_user()
+            self.stdout.write("User created :)")
 
         self.stdout.write("SUCCESS")

@@ -46,7 +46,7 @@ class DroneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Drone
-        fields = ["slug", "serial_number", "model", "weight_limit", "battery_capacity", "state"]
+        fields = ["id", "slug", "serial_number", "model", "weight_limit", "battery_capacity", "state"]
         read_only_fields = ('slug',)
         lookup_field = ('slug',)
         extra_kwargs = {
@@ -110,7 +110,7 @@ class MedicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medication
-        fields = ["slug", "name", "weight", "code", "image"]
+        fields = ["id", "slug", "name", "weight", "code", "image"]
         read_only_fields = ('slug',)
         lookup_field = ('slug',)
         extra_kwargs = {
@@ -138,7 +138,7 @@ class PackageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Package
-        fields = ["slug", "medication", "qty", "created"]
+        fields = ["id", "slug", "medication", "qty", "created"]
         read_only_fields = ('slug', "created")
         lookup_field = ('slug',)
         extra_kwargs = {
@@ -148,9 +148,9 @@ class PackageSerializer(serializers.ModelSerializer):
     def _date_time_formater_(self, S):
         date, time = S.split("T")
         y, m, d = date.split("-")
-        h, M, s = time.split(":")
+        tt = time.split(":")
 
-        return f"{y}-{m}-{d} {h}:{M}"
+        return f"{y}-{m}-{d} {tt[0]}:{tt[1]}"
 
     def to_representation(self, instance):
         package = super().to_representation(instance)
@@ -180,7 +180,7 @@ class DeliveryPackageSerializer(serializers.ModelSerializer):
     '''
     INPUT
     {
-        "slug": <Drone.pk>
+        "drone": <Drone.pk>
         "pacakge": [<Package.pk>, <Package.pk>, ..., <Package.pk>]
     }
 

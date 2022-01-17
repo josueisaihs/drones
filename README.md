@@ -44,27 +44,27 @@ Drone Delivery requires to run:
 #### Linux and Mac
 Clone github repository:
 ```sh
-git clone https://github.com/josueisaihs/drones
+$ git clone https://github.com/josueisaihs/drones
 ```
 Create virtual environment and activate it:
 ```sh
-python3 -m venv env/
+$ python3 -m venv env/
 source env/bin/activate
 ```
 Install dependencies:
 ```sh
-cd src
-pip install -r requirements.txt
+$ cd src
+$ pip install -r requirements.txt
 ```
 Create the database file and create the models in the database:
 ```sh
-cd drones
-./manage.py migrate
+$ cd drones
+$ ./manage.py migrate
 ```
 #### Load data to test the app
 Create data tot test the app:
 ```sh
-./manage.py create_data --all
+$ ./manage.py create_data --all
 ```
 (optional) Added custom commands to add and remove data for testing the app.
 The create command options are:
@@ -74,6 +74,7 @@ optional arguments:
 --drone         Create 10 drones with random data 
 --medication    Create medications with random data
 --package       Create packets with random data
+--user          Create user, username: "admin" and password: "password"
 --all           Create all the above data
 ```
 The remove command options are:
@@ -88,7 +89,7 @@ optional arguments:
 ```
 The battery charge command options are:
 ```sh
-./manage.py charge_batteries [--random]
+$ ./manage.py charge_batteries [--random]
 optional arguments:
 --random         Provides a random value between 10 and 100 for the battery status
 ```
@@ -111,51 +112,51 @@ DRONE_DELIVERY_CONFIG = {
 #### Run Server 
 Finally, run the following to launch the local server
 ```sh
-./manage.py runserver
+$ ./manage.py runserver
 ```
 #### Redis
 First download [Redis](https://download.redis.io/releases/redis-6.2.6.tar.gz) and read the ``README`` file.
 Open the downloaded folder in the another terminal and simply run:
 ```sh
-make
+$ make
 ```
 After building Redis, it is a good idea to test it using:
 ```sh
-make test
+$ make test
 ```
 To run Redis with the default configuration, just type:
 ```sh
-cd src
-./redis-server
+$ cd src
+$ ./redis-server
 ```
 You can use redis-cli to play with Redis. Start a redis-server instance,
 then in another terminal try the following:
 ```sh
-cd src
-./redis-cli
-redis> ping
+$ cd src
+$ ./redis-cli
+$ redis> ping
 PONG
 redis>quit
 ```
 #### Celery
 Open a new instance of the terminal in the project's containing folder to initialize celery:
 ```sh
-source env/bin/activate
-cd src/drones
-celery -A drones worker -l info
+$ source env/bin/activate
+$ cd src/drones
+$ celery -A drones worker -l info
 ```
 And open an another instance of the terminal in the project's containing folder and run the following:
 ```sh
-source env/bin/activate
-cd src/drones
-celery -A drones beat -l info
+$ source env/bin/activate
+$ cd src/drones
+$ celery -A drones beat -l info
 ```
 
 ### Test
 ---
 To run the tests, try the following:
 ```sh
-./migrate test
+$ ./migrate test
 ```
 ### API
 ---
@@ -182,6 +183,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
 JSON format to ``list`` results:
 ```json
 {
+    "id": <Int>,
     "slug": <String>,
     "serial_number": <String>,
     "model": <String: Cruiserweight, Lightweight, "Middleweight, Cruiserweight, Heavyweight>,
@@ -212,6 +214,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
 JSON format to ``list`` results:
 ```json
 {
+    "id": <Int>,
     "slug": <Slug>,
     "name": <String>,
     "weight": <Float>,
@@ -238,6 +241,7 @@ JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``
 JSON format to ``list`` results:
 ```json
 {
+    "id": <Int>,
     "slug": <Slug>,
     "medication": {
         "name": <String>,
@@ -255,12 +259,13 @@ A drone is only available for loading when its battery is greater than ``LOW_BAT
 To create, retrieve, update and destroy deliveries packages:
 ``Create and List``
 [http://localhost:8000/drone-delivery/api/delivery/list/](http://localhost:8000/drone-delivery/api/delivery/list/)
+
 ``Retrieve, Update, Destroy``
 [http://localhost:8000/drone-delivery/api/delivery/<slug:slug>/detail/](http://localhost:8000/drone-delivery/api/delivery/list/)
 JSON format that accepts to ``create``, ``retrieve``, ``update`` and ``destroy``:
 ```json
 {
-    "slug": <Drone.pk>,
+    "drone": <Drone.pk>,
     "package": [<Package.pk>, <Package.pk>, ..., <Package.pk>]
 }
 ```
@@ -277,6 +282,7 @@ JSON format to ``list`` results:
     "package": {
         "items": [
             {
+                "id": <Int>,
                 "slug": <Slug>, 
                 "weight": <Float>, 
                 "qty": <Int>,
@@ -289,4 +295,26 @@ JSON format to ``list`` results:
         "weight": <Float>
     }
 }
+```
+
+## Examples
+---
+Below is the sequence to create a delivery order.
+```sh
+$ curl -X GET http://127.0.0.1:8000/drone-delivery/api/drone/list/
+```
+Using the ``admin`` and ``password`` credentials a drone is registered:
+```sh
+$ curl -u 'admin:password' -d '{"serial_number": "456345647", "model": "Cruiserweight", "weight_limit": 400.0, "battery_capacity": 98, "state": "IDLE"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/drone/list/
+```
+Now the package should be created:
+```sh
+$ curl -u 'admin:password' -d '{"medication": 1, "qty": 1}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/package/list/
+{"id":14,"slug":"acetaminophen-1","medication":{"name":"Acetaminophen","slug":"acetaminophen-x5pjf530s0"},"qty":1,"created":"2022-01-17 00:37","weight":3.0}%  
+$ curl -u 'admin:password' -d '{"medication": 2, "qty": 1}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/package/list/
+{"id":15,"slug":"adenosine-1","medication":{"name":"Adenosine","slug":"adenosine-uxv"},"qty":1,"created":"2022-01-17 00:41","weight":7.0}%
+```
+Finally, the drone is assigned (id = 14) and the packages created (id = 14, id = 15) to form the delivery package:
+```sh
+$ curl -u 'admin:password' -d '{"drone": 14, "package": [14, 15]}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/delivery/list/{"slug":"456345647","drone":{"slug":"456345647","serial_number":456345647.0,"weight_limit":400.0,"battery_capacity":74},"package":{"items":[{"slug":"acetaminophen-1","weight":3.0,"qty":1,"medication":{"slug":"acetaminophen-x5pjf530s0","name":"Acetaminophen"}},{"slug":"adenosine-1","weight":7.0,"qty":1,"medication":{"slug":"adenosine-uxv","name":"Adenosine"}}],"weight":10.0}}
 ```

@@ -29,12 +29,13 @@ from .filters import (
 class DroneDetailView(DetailView):
     # Only for debug
     model = Drone
+    
 
 class DroneDetailApiView(RetrieveUpdateDestroyAPIView):
     serializer_class = DroneSerializer
     queryset = Drone.objects.all()
     lookup_field = "slug"
-
+    
 class DronesListCreateApiView(ListCreateAPIView):
     serializer_class = DroneSerializer
     queryset = Drone.objects.all()
@@ -71,5 +72,3 @@ class DeliveryPackageListCreateApiView(ListCreateAPIView):
     queryset = DeliveryPackage.objects.canLoad()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = DeliveryPackageFilter
-    
-    # todo: Change the drone's state, IDLE to LOADING
