@@ -60,6 +60,8 @@ pip install -r requirements.txt
 Create the database file and create the models in the database:
 ```sh
 cd drones
+mkdir db
+touch db/db.sqlite3
 ./manage.py migrate
 ```
 #### Load data to test the app
@@ -157,6 +159,7 @@ celery -A drones beat -l info
 ---
 To run the tests, try the following:
 ```sh
+cd src/drones
 ./migrate test
 ```
 ### API
@@ -322,18 +325,19 @@ curl -X GET http://127.0.0.1:8000/drone-delivery/api/drone/list/
 Using the ``admin`` and ``password`` credentials a drone is registered:
 ```sh
 curl -u 'admin:password' -d '{"serial_number": "456345647", "model": "Cruiserweight", "weight_limit": 400.0, "battery_capacity": 98, "state": "IDLE"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/drone/list/
+{"id":11,"slug":"456345647","serial_number":"456345647","model":"Cruiserweight","weight_limit":"400.00","battery_capacity":98,"state":"IDLE"}
 ```
 Now the package should be created:
 ```sh
 curl -u 'admin:password' -d '{"medication": 1, "qty": 1}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/package/list/
-{"id":14,"slug":"acetaminophen-1","medication":{"name":"Acetaminophen","slug":"acetaminophen-x5pjf530s0"},"qty":1,"created":"2022-01-17 00:37","weight":3.0}%  
+{"id":11,"slug":"acetaminophen-1","medication":{"name":"Acetaminophen","slug":"acetaminophen-lt0u94wqy8"},"qty":1,"created":"2022-01-17 01:49","weight":4.0}%  
 curl -u 'admin:password' -d '{"medication": 2, "qty": 1}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/package/list/
-{"id":15,"slug":"adenosine-1","medication":{"name":"Adenosine","slug":"adenosine-uxv"},"qty":1,"created":"2022-01-17 00:41","weight":7.0}%
+{"id":12,"slug":"adenosine-1","medication":{"name":"Adenosine","slug":"adenosine-qkd8kg"},"qty":1,"created":"2022-01-17 01:50","weight":7.0}%          
 ```
-Finally, the drone is assigned (id = 14) and the packages created (id = 14, id = 15) to form the delivery package:
+Finally, the drone is assigned (id = 11) and the packages created (id = 11, id = 12) to form the delivery package:
 ```sh
-curl -u 'admin:password' -d '{"drone": 14, "package": [14, 15]}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/delivery/list/
-{"slug":"456345647","drone":{"slug":"456345647","serial_number":456345647.0,"weight_limit":400.0,"battery_capacity":74},"package":{"items":[{"slug":"acetaminophen-1","weight":3.0,"qty":1,"medication":{"slug":"acetaminophen-x5pjf530s0","name":"Acetaminophen"}},{"slug":"adenosine-1","weight":7.0,"qty":1,"medication":{"slug":"adenosine-uxv","name":"Adenosine"}}],"weight":10.0}}
+curl -u 'admin:password' -d '{"drone": 11, "package": [11, 12]}' -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/drone-delivery/api/delivery/list/
+{"slug":"456345647","drone":{"slug":"456345647","serial_number":456345647.0,"weight_limit":400.0,"battery_capacity":98},"package":{"items":[{"slug":"acetaminophen-1","weight":4.0,"qty":1,"medication":{"slug":"acetaminophen-lt0u94wqy8","name":"Acetaminophen"}},{"slug":"adenosine-1","weight":7.0,"qty":1,"medication":{"slug":"adenosine-qkd8kg","name":"Adenosine"}}],"weight":11.0}}%
 ```
 ## Admin
 ---
